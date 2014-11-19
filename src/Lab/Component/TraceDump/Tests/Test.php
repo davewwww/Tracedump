@@ -18,9 +18,9 @@ class FilternEntriesVoterTest extends \PHPUnit_Framework_TestCase
         #$a = ["foo" => ["sun", "set", [666]]];
         #$a = ["mann" => new Mann()];
         #$a = ["mann"];
-         $a = new Mann();
+        $a = new Mann();
 
-        die(tde($a));
+        #die(tde($a));
         die(TraceDump::tracedump($a));
     }
 
@@ -81,7 +81,7 @@ class Mann extends Mensch
         return $this->bart;
     }
 
-    public function setBart($bart)
+    public function setBart($bart, $asd = null)
     {
         $this->bart = $bart;
     }

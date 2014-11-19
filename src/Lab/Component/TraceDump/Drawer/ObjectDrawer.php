@@ -17,63 +17,36 @@ class ObjectDrawer
     protected $styler;
 
     /**
+     * @var MethodDrawer
+     */
+    protected $methodDrawer;
+
+    /**
      * @param StylerInterface $styler
      */
     function __construct(StylerInterface $styler)
     {
         $this->styler = $styler;
+        $this->methodDrawer = new MethodDrawer($styler);
     }
 
     function draw(array $data, $deep = 0)
     {
-        return array();
-
-        $styler = $this->styler;
-
-        $ident = str_repeat($styler->getWhitespace(), self::IDENTS * $deep);
-        $identKey = str_repeat($styler->getWhitespace(), self::IDENTS * ($deep + 1));
+        $object = $data["object"];
+        $reflection = $data["reflection"];
 
         $lines = array(
-            "array("
+            $this->styler->style("object_name", $reflection->getName()),
+            $this->styler->getNewLine(),
         );
 
-        //maxname
-        $nameMaxStrlen = 0;
-        foreach ($data as $dump) {
-            if (($strlen = strlen($dump["name"])) > $nameMaxStrlen) {
-                $nameMaxStrlen = $strlen;
-            };
+        $methods = $reflection->getMethods();
+        if (!empty($methods)) {
+            $methodLines = $this->methodDrawer->draw(array("object"=>$object,"methods" => $methods));
+            $lines = array_merge($lines,$methodLines);
         }
 
-        if (!empty($data)) {
-            foreach ($data as $dump) {
-                $type = $dump["type"];
-                $key = $dump["name"];
-                $value = $dump["value"];
-
-                $whitespaces = "";
-                if (($whitespacesCount = $nameMaxStrlen - strlen($key)) > 0) {
-                    $whitespaces = str_repeat($styler->getWhitespace(), $whitespacesCount);
-                }
-
-                $key = $identKey.$styler->style("string", $key).$whitespaces;
-
-                if (is_array($value)) {
-                    $drawArray = $this->draw($value, $deep + 1);
-
-                    $lines[] = $key." => ".$drawArray[0];
-                    unset($drawArray[0]);
-
-                    $lines = array_merge($lines, $drawArray);
-
-                } elseif (is_scalar($value)) {
-                    $lines[] = $key." => ".$styler->style($type, $value);
-                }
-            }
-            $lines[] = $ident.")";
-        } else {
-            $lines[0] .= ")";
-        }
+         #die(tde($methodLines));
 
         return $lines;
     }
