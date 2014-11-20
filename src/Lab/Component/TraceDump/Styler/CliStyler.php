@@ -92,18 +92,26 @@ class CliStyler implements StylerInterface
                 break;
 
             case "object_name":
-                 $value = $this->LCC($value, "1;44");
+                $value = $this->LCC($value, "1;44");
                 break;
 
             case "object_name_light":
-                 $value = $this->LCC($value, "0;104");
+                $value = $this->LCC($value, "0;104");
                 break;
 
             case "method":
-                list($name,$param) = $value;
+                list($name, $param) = $value;
                 $value = "function ";
                 $value .= $this->LCC($name, 1);
-                $value .= "(".$this->LCC($param, 93).")";
+                $value .= "(".$this->style("name", $param).")";
+                break;
+
+            case "name":
+                $value = $this->LCC($value, 93);
+                break;
+
+            case "gray":
+                $value = $this->LCC($value, 7);
                 break;
 
             case "no_style":

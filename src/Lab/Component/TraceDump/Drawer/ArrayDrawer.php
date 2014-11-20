@@ -24,12 +24,13 @@ class ArrayDrawer
         $this->styler = $styler;
     }
 
-    function draw(array $data, $deep = 0)
+    function draw(array $data, $deep = 0, $pos = 0)
     {
         $styler = $this->styler;
 
-        $ident = str_repeat($styler->getWhitespace(), self::IDENTS * $deep);
-        $identKey = str_repeat($styler->getWhitespace(), self::IDENTS * ($deep + 1));
+        $whitespacesPos = str_repeat($this->styler->getWhitespace(), $pos);
+        $ident = $whitespacesPos.str_repeat($styler->getWhitespace(), self::IDENTS * $deep);
+        $identKey = $whitespacesPos.str_repeat($styler->getWhitespace(), self::IDENTS * ($deep + 1));
 
         $lines = array(
             "array("
@@ -57,7 +58,7 @@ class ArrayDrawer
                 $key = $identKey.$styler->style("string", $key).$whitespaces;
 
                 if (is_array($value)) {
-                    $drawArray = $this->draw($value, $deep + 1);
+                    $drawArray = $this->draw($value, $deep + 1, $pos);
 
                     $lines[] = $key." => ".$drawArray[0];
                     unset($drawArray[0]);

@@ -2,6 +2,8 @@
 
 namespace Lab\Component\TraceDump;
 
+use ReflectionProperty;
+
 /**
  *
  * @author David Wolter <david@dampfer.net>
@@ -52,10 +54,23 @@ class Dumper
     {
         $end = array();
         foreach ($array as $name => $value) {
+
+            $valueType = gettype($value);
+
+            if(is_array($value)) {
+                $value = self::dumpArray($value);
+            }
+//            elseif(is_object($value)) {
+//                $value = self::dumpObject($value);
+//            }
+            else {
+                $value = self::dumpValue($value);
+            }
+
             $end[] = array(
                 "name"  => $name,
-                "value" => is_array($value) ? self::dumpArray($value) : self::dumpValue($value),
-                "type"  => gettype($value),
+                "value" => $value,
+                "type"  => $valueType,
             );
         }
 
@@ -69,11 +84,128 @@ class Dumper
      */
     private static function dumpObject($object)
     {
+        $reflection = new \ReflectionClass($object);
+
         return array(
             "type"       => "object",
             "object"     => $object,
+            "methods"    => self::dumpMethods($reflection, $object),
+            "properties" => self::dumpProperties($reflection, $object),
             "reflection" => new \ReflectionClass($object),
         );
+    }
+
+    /**
+     * @param \ReflectionClass $reflection
+     * @param object           $object
+     *
+     * @return array
+     */
+    private static function dumpMethods(\ReflectionClass $reflection, $object)
+    {
+        $methods = [];
+        foreach ($reflection->getMethods() as $method) {
+
+            $arguments = [];
+            foreach ($method ->getParameters() as $reflectionParameter) {
+
+                $cast = $castType = null;
+                if (null !== $class = $reflectionParameter->getClass()) {
+                    $cast = $class->getShortName();
+                    $castType = "object";
+                } elseif ($reflectionParameter->isArray()) {
+                    $cast = $castType = "array";
+                }
+
+                $defaultValue = $defaultValueType = null;
+                if ($reflectionParameter->isDefaultValueAvailable()) {
+                    $defaultValue = $reflectionParameter->getDefaultValue();
+                    $defaultValueType = gettype($defaultValue);
+                }
+
+                $arguments[] = array(
+                    "name"             => $reflectionParameter->getName(),
+                    "cast"             => $cast,
+                    "castType"         => $castType,
+                    "defaultValue"     => $defaultValue,
+                    "defaultValueType" => $defaultValueType,
+                );
+            }
+
+            //DeclaringClass
+            $declaringClass = $method ->getDeclaringClass()->getName();
+            if (get_class($object) === $declaringClass) {
+                $declaringClass = null;
+            }
+
+            $methods[] = arraY(
+                "name"           => $method->getName(),
+                "access"         => self::dumpAccess($method),
+                "arguments"      => $arguments,
+                "declaringClass" => $declaringClass,
+            );
+        }
+
+        return $methods;
+    }
+
+    private static function dumpAccess($property)
+    {
+        foreach (array("public", "protected", "private", null) as $access) {
+            if (method_exists($property, $method = "is".ucfirst($access))) {
+                if ($property ->$method()) {
+                    break;
+                }
+            }
+        }
+
+        return $access;
+    }
+
+    /**
+     * @param \ReflectionClass $reflection
+     * @param object           $object
+     *
+     * @return array
+     */
+    private static function dumpProperties(\ReflectionClass $reflection, $object)
+    {
+        /** @var ReflectionProperty[] $properties */
+        $properties = array_merge((array)$reflection->getProperties(), (array)$reflection->getStaticProperties());
+
+        $end = array();
+
+        foreach ($properties as $property) {
+
+            //Value
+            $value = null;
+            if (method_exists($property, "setAccessible")) {
+                $property ->setAccessible(true);
+            }
+            if (method_exists($property, "getValue")) {
+                $value = $property ->getValue($object);
+                if (is_array($value)) {
+                    $value = self::dumpArray($value);
+                }
+            }
+
+            //DeclaringClass
+            $declaringClass = null;
+            if (method_exists($property, "getDeclaringClass")) {
+                if (get_class($object) === $declaringClass = $property ->getDeclaringClass()->getName()) {
+                    $declaringClass = null;
+                }
+            }
+
+            $end[] = array(
+                "access"         => self::dumpAccess($property),
+                "name"           => $property ->getName(),
+                "value"          => $value,
+                "declaringClass" => $declaringClass,
+            );
+        }
+
+        return $end;
     }
 
     /**

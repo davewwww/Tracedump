@@ -31,66 +31,78 @@ class MethodDrawer
      *
      * @return mixed
      */
-    function draw(array $data, $deep = 0)
+    function draw(array $data, $deep = 0, $pos = 0)
     {
-        $declaringClassPre = null;
-
-        /**
-         * @var ReflectionMethod[] $methods
-         */
-        $methods = $data["methods"];
         $object = $data["object"];
+        $methods = $data["methods"];
+
+        $ident = str_repeat($this->styler->getWhitespace(), self::IDENTS * $deep);
+
+        $declaringClassPre = null;
 
         $lines = [];
 
         foreach ($methods as $method) {
-            $name = $method->getName();
+            $name = $method["name"];
+            $declaringClass = $method["declaringClass"];
 
             //Method Parameter
             $arguments = array();
-            foreach ($method ->getParameters() as $reflectionParameter) {
+            foreach ($method["arguments"] as $argument) {
 
-                $param = "";
+                $argumentString = "";
 
                 //Cast
-                if (null !== $class = $reflectionParameter->getClass()) {
-                    $param .= $this->styler->style("object_name", $class->getShortName())." ";
-                } elseif ($reflectionParameter->isArray()) {
-                    $param .= "array ";
+                $cast = $argument["cast"];
+                $castType = $argument["castType"];
+                if ("object" === $castType) {
+                    $argumentString .= $this->styler->style("object_name", $cast)." ";
+                } elseif ("array" === $castType) {
+                    $argumentString .= "array ";
                 }
 
                 //Name
-                $param .= "$".$reflectionParameter->getName();
+                $argumentString .= "$".$argument["name"];
 
                 //DefaultValue
-                if ($reflectionParameter->isDefaultValueAvailable()) {
-                    $defaultValue = $reflectionParameter->getDefaultValue();
-                    if (is_array($defaultValue)) {
+                $defaultValue = $argument["defaultValue"];
+                $defaultValueType = $argument["defaultValueType"];
+                if (null !== $defaultValue || "NULL" === $defaultValueType) {
+                    if ("array" === $defaultValueType) {
                         $defaultValue = str_replace("\n", "", var_export($defaultValue, 1));
                     } else {
-                        $defaultValue = $this->styler->style(gettype($defaultValue), $defaultValue);
+                        $defaultValue = $this->styler->style($defaultValueType, $defaultValue);
                     }
-                    $param .= " = ".$defaultValue;
+                    $argumentString .= " = ".$defaultValue;
                 }
 
-                $arguments[] = $param;
+                $arguments[] = $argumentString;
             }
-
 
             //DeclaringClass
-            $declaringClass = $method ->getDeclaringClass()->getName();
-            if (get_class($object) !== $declaringClass && $declaringClassPre !== $declaringClass) {
-                $lines[] = $this->styler->getWhitespace();
-                $lines[] = $this->styler->style("object_name_light", $declaringClassPre = $declaringClass);
+            if ($declaringClassPre !== $declaringClass) {
+                $lines[] = $ident.$this->styler->getWhitespace();
+                $lines[] = $ident.$this->styler->style("object_name_light", $declaringClassPre = $declaringClass);
             }
 
-            $name = $this->styler->style("method", array($name, $arguments ? implode(", ", $arguments) : ""));
+            $access = $method["access"];
+            $whitespacesAccess = "";
+            if (($whitespacesCount = 10 - strlen($access)) > 0) {
+                $whitespacesAccess = str_repeat($this->styler->getWhitespace(), $whitespacesCount);
+            }
+            $access = " ".$access." ";
 
-            $lines[] = $name;
-
-            #die(tde($method->getParameters()));
+            $lines[] = $ident.
+                $this->styler->style("gray", $access).
+                " ".
+                $this->styler->style("method", array($name, $arguments ? implode(", ", $arguments) : ""));
         }
 
+        if($pos>0) {
+            foreach($lines as $k => $v) {
+                $lines[$k] = str_repeat($this->styler->getWhitespace(), $pos).$v;
+            }
+        }
         return $lines;
     }
 

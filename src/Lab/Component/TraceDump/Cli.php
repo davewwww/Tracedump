@@ -112,7 +112,7 @@ class Cli
 
             case "object":
                 $drawer = new ObjectDrawer($this->styler);
-                $lines = $drawer ->draw($value);
+                $lines = $drawer ->draw($value, 0, 4);
                 break;
 
             default:

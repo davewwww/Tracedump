@@ -28,25 +28,43 @@ class ObjectDrawer
     {
         $this->styler = $styler;
         $this->methodDrawer = new MethodDrawer($styler);
+        $this->propertyDrawer = new ObjectPropertiesDrawer($styler);
     }
 
-    function draw(array $data, $deep = 0)
+    function draw(array $data, $deep = 0, $pos = 0)
     {
         $object = $data["object"];
         $reflection = $data["reflection"];
+        $methods = $data["methods"];
+        $properties = $data["properties"];
+
+        #die(tde($properties));
+
+        $ident = str_repeat($this->styler->getWhitespace(), self::IDENTS * $deep);
+        $posWhitespaces = str_repeat($this->styler->getWhitespace(), $pos);
 
         $lines = array(
-            $this->styler->style("object_name", $reflection->getName()),
-            $this->styler->getNewLine(),
+            $posWhitespaces.$ident.$this->styler->style("object_name", $reflection->getName()),
+            $posWhitespaces.$ident.$this->styler->getNewLine(),
         );
 
-        $methods = $reflection->getMethods();
+        /**
+         * methods & properties anhang der declaringClass groupen
+         */
         if (!empty($methods)) {
-            $methodLines = $this->methodDrawer->draw(array("object"=>$object,"methods" => $methods));
-            $lines = array_merge($lines,$methodLines);
+            $methodLines = $this->methodDrawer->draw(array("object" => $object, "methods" => $methods), $deep, $pos);
+            $lines = array_merge($lines, $methodLines);
+        }
+        if (!empty($properties)) {
+            $propertiesLines = $this->propertyDrawer->draw(
+                array("object" => $object, "properties" => $properties),
+                $deep,
+                $pos
+            );
+            $lines = array_merge($lines, $propertiesLines);
         }
 
-         #die(tde($methodLines));
+        #die(tde($methodLines));
 
         return $lines;
     }

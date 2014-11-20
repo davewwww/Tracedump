@@ -4,8 +4,9 @@ namespace Lab\Component\TraceDump\Tests;
 
 use Lab\Component\TraceDump\TraceDump;
 
-class FilternEntriesVoterTest extends \PHPUnit_Framework_TestCase
+class Test extends \PHPUnit_Framework_TestCase
 {
+
     public function test()
     {
         include __DIR__."/../Resources/functions/lib/die_console.php";
@@ -51,15 +52,28 @@ class FilternEntriesVoterTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-interface Name
+interface NameInterface
 {
     public function getName();
 }
 
-class Mensch implements Name
+class Mensch implements NameInterface
 {
     public $name;
     public $haare = array("schwarz", "kurz");
+    public $auto = null;
+
+    function __construct()
+    {
+        $this->auto = new Auto();
+        $this->haare = array(
+            "schwarz",
+            "kurz",
+            "drecking" => array(
+                new Auto(),
+            )
+        );
+    }
 
     public function getName()
     {
@@ -72,6 +86,19 @@ class Mensch implements Name
     }
 }
 
+class Auto
+{
+    public $type = "audi";
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+}
+
 class Mann extends Mensch
 {
     public $bart;
@@ -81,7 +108,7 @@ class Mann extends Mensch
         return $this->bart;
     }
 
-    public function setBart($bart, $asd = null)
+    public function setBart(NameInterface $bart, $asd = null)
     {
         $this->bart = $bart;
     }
