@@ -57,7 +57,7 @@ class Dumper
 
             $valueType = gettype($value);
 
-            if(is_array($value)) {
+            if (is_array($value)) {
                 $value = self::dumpArray($value);
             }
 //            elseif(is_object($value)) {
@@ -107,7 +107,7 @@ class Dumper
         foreach ($reflection->getMethods() as $method) {
 
             $arguments = [];
-            foreach ($method ->getParameters() as $reflectionParameter) {
+            foreach ($method->getParameters() as $reflectionParameter) {
 
                 $cast = $castType = null;
                 if (null !== $class = $reflectionParameter->getClass()) {
@@ -133,7 +133,7 @@ class Dumper
             }
 
             //DeclaringClass
-            $declaringClass = $method ->getDeclaringClass()->getName();
+            $declaringClass = $method->getDeclaringClass()->getName();
             if (get_class($object) === $declaringClass) {
                 $declaringClass = null;
             }
@@ -149,17 +149,22 @@ class Dumper
         return $methods;
     }
 
+    /**
+     * @param string $property
+     *
+     * @return string|null
+     */
     private static function dumpAccess($property)
     {
-        foreach (array("public", "protected", "private", null) as $access) {
+        foreach (array("public", "protected", "private") as $access) {
             if (method_exists($property, $method = "is".ucfirst($access))) {
-                if ($property ->$method()) {
-                    break;
+                if ($property->$method()) {
+                    return $access;
                 }
             }
         }
 
-        return $access;
+        return null;
     }
 
     /**
@@ -171,7 +176,7 @@ class Dumper
     private static function dumpProperties(\ReflectionClass $reflection, $object)
     {
         /** @var ReflectionProperty[] $properties */
-        $properties = array_merge((array)$reflection->getProperties(), (array)$reflection->getStaticProperties());
+        $properties = array_merge((array) $reflection->getProperties(), (array) $reflection->getStaticProperties());
 
         $end = array();
 
@@ -180,10 +185,10 @@ class Dumper
             //Value
             $value = null;
             if (method_exists($property, "setAccessible")) {
-                $property ->setAccessible(true);
+                $property->setAccessible(true);
             }
             if (method_exists($property, "getValue")) {
-                $value = $property ->getValue($object);
+                $value = $property->getValue($object);
                 if (is_array($value)) {
                     $value = self::dumpArray($value);
                 }
@@ -192,14 +197,14 @@ class Dumper
             //DeclaringClass
             $declaringClass = null;
             if (method_exists($property, "getDeclaringClass")) {
-                if (get_class($object) === $declaringClass = $property ->getDeclaringClass()->getName()) {
+                if (get_class($object) === $declaringClass = $property->getDeclaringClass()->getName()) {
                     $declaringClass = null;
                 }
             }
 
             $end[] = array(
                 "access"         => self::dumpAccess($property),
-                "name"           => $property ->getName(),
+                "name"           => $property->getName(),
                 "value"          => $value,
                 "declaringClass" => $declaringClass,
             );
@@ -230,7 +235,6 @@ class Dumper
 
             case "object":
                 $refl = new \ReflectionClass($value);
-                #$value = $refl -> getName();
                 $value = $refl->getName();
                 break;
 
