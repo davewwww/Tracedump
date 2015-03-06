@@ -182,6 +182,10 @@ class Dumper
 
         foreach ($properties as $property) {
 
+            if(!is_object($property)) {
+                continue;
+            }
+
             //Value
             $value = null;
             if (method_exists($property, "setAccessible")) {
