@@ -21,5 +21,8 @@
     "require-dev": {
         "phpunit/phpunit": "~3.7.0",
         "symfony/var-dumper": "2.6.*@dev"
+    },
+    "autoload-dev": {
+        "files": [ "src/Lab/Component/TraceDump/Resources/functions/functions.php" ]
     }
 }
