@@ -20,11 +20,14 @@ class TraceDump
      */
     public static function tracedump()
     {
-        if(preg_match('/WIN/', PHP_OS)) {
-            $class = new Cli(new WindowsStyler());
-        }
-        elseif (self::isCli()) {
-            $class = new Cli(new CliStyler());
+        if (self::isCli()) {
+            if (self::isWindows()) {
+                $styler = new WindowsStyler();
+            }
+            else {
+                $styler = new CliStyler();
+            }
+            $class = new Cli($styler);
         } else {
             $class = new Html();
         }
@@ -46,6 +49,13 @@ class TraceDump
     public static function isCli()
     {
         return 'cli' === PHP_SAPI || self::$forceCli;
+    }
+    /**
+     * @return bool
+     */
+    public static function isWindows()
+    {
+        return preg_match('/WIN/', PHP_OS);
     }
 
 }
