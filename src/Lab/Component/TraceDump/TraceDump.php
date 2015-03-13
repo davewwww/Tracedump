@@ -3,6 +3,7 @@
 namespace Lab\Component\TraceDump;
 
 use Lab\Component\TraceDump\Styler\CliStyler;
+use Lab\Component\TraceDump\Styler\WindowsStyler;
 
 /**
  * @author David Wolter <david@dampfer.net>
@@ -19,7 +20,10 @@ class TraceDump
      */
     public static function tracedump()
     {
-        if (self::isCli()) {
+        if(preg_match('/WIN/', PHP_OS)) {
+            $class = new Cli(new WindowsStyler());
+        }
+        elseif (self::isCli()) {
             $class = new Cli(new CliStyler());
         } else {
             $class = new Html();
