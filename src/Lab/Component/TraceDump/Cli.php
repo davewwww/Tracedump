@@ -87,7 +87,6 @@ class Cli
             $dump = Dumper::dump($arg);
             $dumpOutput = $this ->draw($dump);
 
-            die($dumpOutput);
             $dumps[] = $dumpOutput;
         }
 
