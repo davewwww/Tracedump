@@ -5,9 +5,12 @@ namespace Lab\Component\TraceDump;
 /**
  * @author David Wolter <david@dampfer.net>
  */
-class Html
+class Html implements TraceDumperInterface
 {
-    function tracedump()
+    /**
+     * {@inheritdoc}
+     */
+    public function tracedump()
     {
         $end = array();
         $args = func_get_args();

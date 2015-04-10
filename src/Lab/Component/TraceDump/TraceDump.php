@@ -3,7 +3,7 @@
 namespace Lab\Component\TraceDump;
 
 use Lab\Component\TraceDump\Styler\CliStyler;
-use Lab\Component\TraceDump\Styler\WindowsStyler;
+use Lab\Component\TraceDump\Styler\Coloring\ColoringFactory;
 
 /**
  * @author David Wolter <david@dampfer.net>
@@ -16,18 +16,14 @@ class TraceDump
     private static $forceCli = false;
 
     /**
-     * @return mixed
+     * {@inheritdoc}
      */
     public static function tracedump()
     {
         if (self::isCli()) {
-            if (self::isWindows()) {
-                $styler = new WindowsStyler();
-            }
-            else {
-                $styler = new CliStyler();
-            }
-            $class = new Cli($styler);
+            ColoringFactory::setColoringClass(self::isWindows() ? ColoringFactory::NONE : ColoringFactory::CLI);
+
+            $class = new Cli(new CliStyler());
         } else {
             $class = new Html();
         }
@@ -50,6 +46,7 @@ class TraceDump
     {
         return 'cli' === PHP_SAPI || self::$forceCli;
     }
+
     /**
      * @return bool
      */

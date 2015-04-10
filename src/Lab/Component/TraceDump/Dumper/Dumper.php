@@ -1,11 +1,8 @@
 <?php
 
-namespace Lab\Component\TraceDump;
-
-use ReflectionProperty;
+namespace Lab\Component\TraceDump\Dumper;
 
 /**
- *
  * @author David Wolter <david@dampfer.net>
  */
 class Dumper
@@ -182,7 +179,7 @@ class Dumper
 
         foreach ($properties as $property) {
 
-            if(!is_object($property)) {
+            if (!is_object($property)) {
                 continue;
             }
 

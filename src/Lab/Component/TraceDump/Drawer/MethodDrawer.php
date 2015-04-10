@@ -56,13 +56,14 @@ class MethodDrawer
                 $cast = $argument["cast"];
                 $castType = $argument["castType"];
                 if ("object" === $castType) {
-                    $argumentString .= $this->styler->style("object_name", $cast)." ";
+                    $argumentString .= $this->styler->style("object_name_light", $cast)." ";
                 } elseif ("array" === $castType) {
                     $argumentString .= "array ";
                 }
 
                 //Name
-                $argumentString .= "$".$argument["name"];
+                #$argumentString .= "$".$argument["name"];
+                $argumentString .= $this->styler->style('name', "$".$argument["name"]);
 
                 //DefaultValue
                 $defaultValue = $argument["defaultValue"];
@@ -94,7 +95,7 @@ class MethodDrawer
 
             $lines[] = $ident.
                 $this->styler->style("gray", $access).
-                " ".
+                $whitespacesAccess.
                 $this->styler->style("method", array($name, $arguments ? implode(", ", $arguments) : ""));
         }
 

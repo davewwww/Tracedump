@@ -87,11 +87,19 @@ class WindowsStyler implements StylerInterface
 
     function getWhitespace()
     {
-        return " ";
+        return "&nbsp;";
     }
 
     function getNewLine()
     {
-        return "\n";
+        return "<br>";
+    }
+
+    /**
+     * @return string
+     */
+    public function getLine()
+    {
+        return '<hr>';
     }
 }
