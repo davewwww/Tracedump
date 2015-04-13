@@ -1,7 +1,9 @@
 <?php
 
-namespace Lab\Component\TraceDump\Drawer;
+namespace Lab\Component\TraceDump;
 
+use Lab\Component\TraceDump\Drawer\ArrayDrawer;
+use Lab\Component\TraceDump\Drawer\ObjectDrawer;
 use Lab\Component\TraceDump\Styler\StylerInterface;
 
 /**
@@ -10,46 +12,32 @@ use Lab\Component\TraceDump\Styler\StylerInterface;
 class Drawer
 {
     /**
-     * @var StylerInterface
-     */
-    protected $styler;
-
-    /**
-     * @param StylerInterface $styler
-     */
-    public function __construct(StylerInterface $styler)
-    {
-        $this->styler = $styler;
-    }
-
-    /**
      * @param array $dump
      *
      * @return string
      */
-    public function draw(array $dump)
+    public static function draw(array $dump, StylerInterface $styler)
     {
         $type = $dump["type"];
         $value = $dump["value"];
 
         switch ($type) {
             case "array":
-                $drawer = new ArrayDrawer($this->styler);
+                $drawer = new ArrayDrawer($styler);
                 $lines = $drawer->draw($value);
                 break;
 
             case "object":
-                $drawer = new ObjectDrawer($this->styler);
+                $drawer = new ObjectDrawer($styler);
                 $lines = $drawer->draw($value, 0, 4);
                 break;
 
             default:
-                $value = $this->styler->style($type, $value);
+                $value = $styler->style($type, $value);
                 $lines = array($value);
                 break;
         }
 
-        return implode($this->styler->getNewLine(), $lines).$this->styler->getNewLine();
+        return implode($styler->getNewLine(), $lines).$styler->getNewLine();
     }
-
 }

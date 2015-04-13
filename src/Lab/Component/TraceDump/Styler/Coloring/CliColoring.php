@@ -2,11 +2,14 @@
 
 namespace Lab\Component\TraceDump\Styler\Coloring;
 
+use Symfony\Component\VarDumper\VarDumper;
+
 /**
  * @author David Wolter <david@dampfer.net>
  */
 class CliColoring extends AbstractColoring
 {
+    const NO_COLOR = 0;
 
     /*
         http://www.developer.com/open/article.php/10930_631241_2/Linux-Console-Colors--Other-Tricks.htm
@@ -56,15 +59,23 @@ class CliColoring extends AbstractColoring
         die("\033[7m" . "Blabla". "\033[0m");
     */
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         if (null === $command = $this->buildCommand()) {
-            $command = 0;
+            $command = self::NO_COLOR;
+
         }
 
         return "\033[".$command."m".$this->text."\033[0m";
     }
 
+
+    /**
+     * @return string
+     */
     private function buildCommand()
     {
         $allFontColors = $this->getTextColorTable();
@@ -84,7 +95,7 @@ class CliColoring extends AbstractColoring
             $bgColor = $allBgColors[$this->backgroundColor];
 
             if (null === $textColor) {
-                $textColor = 0;
+                $textColor = self::NO_COLOR;
             }
         }
 
@@ -107,10 +118,13 @@ class CliColoring extends AbstractColoring
         return implode(';', $styles);
     }
 
-    protected function getTextColorTable()
+    /**
+     * @return array
+     */
+    private function getTextColorTable()
     {
         return array(
-            ColoringInterface::NO_COLOR    => 0,
+            ColoringInterface::NO_COLOR    => self::NO_COLOR,
             ColoringInterface::RED         => 31,
             ColoringInterface::LIGHT_GREEN => 92,
             ColoringInterface::YELLOW      => 93,
@@ -118,7 +132,10 @@ class CliColoring extends AbstractColoring
         );
     }
 
-    protected function getBGColorTable()
+    /**
+     * @return array
+     */
+    private function getBGColorTable()
     {
         return array(
             ColoringInterface::RED        => 41,
@@ -128,7 +145,10 @@ class CliColoring extends AbstractColoring
         );
     }
 
-    protected function getStyleTable()
+    /**
+     * @return array
+     */
+    private function getStyleTable()
     {
         return array(
             ColoringInterface::STYLE_BOLD     => 1,

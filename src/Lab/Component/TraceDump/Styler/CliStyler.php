@@ -2,87 +2,13 @@
 
 namespace Lab\Component\TraceDump\Styler;
 
-use Lab\Component\TraceDump\Styler\Coloring\ColoringFactory;
-use Lab\Component\TraceDump\Styler\Coloring\ColoringInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * @author David Wolter <david@dampfer.net>
  */
-class CliStyler implements StylerInterface
+class CliStyler extends DefaultStyler implements StylerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function style($type, $value)
-    {
-        $color = ColoringFactory::create(is_scalar($value) ? $value : '');
-
-        switch ($type) {
-            case 'string':
-                $l = strlen($value);
-                $max = 100;
-                if ($l > $max) {
-                    $value = substr($value, 0, $max).' ... ';
-                }
-                $color->setText('"'.$value.'"');
-                $color->setTextColor(ColoringInterface::RED);
-                break;
-
-            case 'integer':
-            case 'double':
-                $color->setTextColor(ColoringInterface::LIGHT_GREEN);
-                break;
-
-            case 'boolean':
-                $color->setText($value = in_array($value, array(true, 'true'), true) ? 'true' : 'false');
-                $color->setBackgroundColor('true' === $value ? ColoringInterface::GREEN : ColoringInterface::RED);
-                break;
-
-            case 'object':
-                $refl = new \ReflectionClass($value);
-                $color = $this->style('object_name', $refl->getName());
-                break;
-
-            case 'object_name':
-                $color->addStyle(ColoringInterface::STYLE_BOLD);
-                $color->setBackgroundColor(ColoringInterface::BLUE);
-                break;
-
-            case 'object_name_light':
-                $color->setBackgroundColor(ColoringInterface::LIGHT_BLUE);
-                break;
-
-            case 'method':
-                list($name, $param) = $value;
-
-                $nameColor = ColoringFactory::create($name);
-                $nameColor->addStyle(ColoringInterface::STYLE_BOLD);
-
-                $color = sprintf('function %s(%s)', (string) $nameColor, $param);
-                break;
-
-            case 'name':
-                $color->setTextColor(ColoringInterface::YELLOW);
-                break;
-
-            case 'gray':
-                $color->setTextColor(ColoringInterface::GRAY);
-                break;
-
-            case 'NULL':
-                $color->setText('null');
-                $color->addStyle(ColoringInterface::STYLE_INVERSED);
-                break;
-
-            default:
-            case 'no_style':
-                $color->setTextColor(ColoringInterface::NO_COLOR);
-                break;
-        }
-
-        return is_object($color) ? (string) $color : $color;
-    }
-
     /**
      * @return string
      */
@@ -102,8 +28,26 @@ class CliStyler implements StylerInterface
     /**
      * @return string
      */
-    public function getLine()
+    public function getSeperator()
     {
-        return str_repeat('-', 40);
+        $newLine = $this->getNewLine();
+
+        $line = str_repeat('-', 40);
+        $line = $this->style('gray', $line);
+
+        return $newLine.$line.$newLine;
+    }
+
+    /**
+     * @param array $dumps
+     *
+     * @return string
+     */
+    public function dump(array $dumps)
+    {
+        $newLine = $this->getNewLine();
+        $dump = implode($this->getSeperator(), $dumps).$this->getNewLine();
+
+        return $dump.$newLine.$newLine;
     }
 }

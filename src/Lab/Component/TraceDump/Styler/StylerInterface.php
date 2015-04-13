@@ -8,6 +8,13 @@ namespace Lab\Component\TraceDump\Styler;
 interface StylerInterface
 {
     /**
+     * @param array $dumps
+     *
+     * @return string
+     */
+    public function dump(array $dumps);
+
+    /**
      * @param string $type
      * @param string $value
      *
@@ -28,5 +35,5 @@ interface StylerInterface
     /**
      * @return string
      */
-    public function getLine();
+    public function getSeperator();
 }

@@ -3,12 +3,11 @@
 namespace Lab\Component\TraceDump\Drawer;
 
 use Lab\Component\TraceDump\Styler\StylerInterface;
-use ReflectionMethod;
 
 /**
  * @author David Wolter <david@dampfer.net>
  */
-class ObjectPropertiesDrawer
+class ObjectPropertiesDrawer implements DrawerInterface
 {
     const IDENTS = 4;
 
@@ -20,19 +19,16 @@ class ObjectPropertiesDrawer
     /**
      * @param StylerInterface $styler
      */
-    function __construct(StylerInterface $styler)
+    public function __construct(StylerInterface $styler)
     {
         $this->arrayDrawer = new ArrayDrawer($styler);
         $this->styler = $styler;
     }
 
     /**
-     * @param array $data
-     * @param int   $deep
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    function draw(array $data, $deep = 0, $pos = 0)
+    public function draw(array $data, $deep = 0, $pos = 0)
     {
         $object = $data["object"];
         $properties = $data["properties"];
@@ -58,13 +54,13 @@ class ObjectPropertiesDrawer
             $name = "$".$name;
 
             if (is_array($value)) {
-                $value = $this->arrayDrawer->draw($value, $deep + 2, $pos );
+                $value = $this->arrayDrawer->draw($value, $deep + 2, $pos);
                 $value = implode($this->styler->getNewLine(), $value);
             } else {
                 $value = $this->styler->style(gettype($value), $value);
             }
 
-            $lines[] = $ident .
+            $lines[] = $ident.
                 #$whitespacesAccess.
                 $this->styler->style("gray", $access).
                 " ".
@@ -74,11 +70,12 @@ class ObjectPropertiesDrawer
 
         }
 
-        if($pos>0) {
-            foreach($lines as $k => $v) {
+        if ($pos > 0) {
+            foreach ($lines as $k => $v) {
                 $lines[$k] = str_repeat($this->styler->getWhitespace(), $pos).$v;
             }
         }
+
         return $lines;
     }
 

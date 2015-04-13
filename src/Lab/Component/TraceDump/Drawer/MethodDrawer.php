@@ -3,12 +3,11 @@
 namespace Lab\Component\TraceDump\Drawer;
 
 use Lab\Component\TraceDump\Styler\StylerInterface;
-use ReflectionMethod;
 
 /**
  * @author David Wolter <david@dampfer.net>
  */
-class MethodDrawer
+class MethodDrawer implements DrawerInterface
 {
     const IDENTS = 4;
 
@@ -20,18 +19,15 @@ class MethodDrawer
     /**
      * @param StylerInterface $styler
      */
-    function __construct(StylerInterface $styler)
+    public function __construct(StylerInterface $styler)
     {
         $this->styler = $styler;
     }
 
     /**
-     * @param array $data
-     * @param int   $deep
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    function draw(array $data, $deep = 0, $pos = 0)
+    public function draw(array $data, $deep = 0, $pos = 0)
     {
         $object = $data["object"];
         $methods = $data["methods"];
@@ -99,11 +95,12 @@ class MethodDrawer
                 $this->styler->style("method", array($name, $arguments ? implode(", ", $arguments) : ""));
         }
 
-        if($pos>0) {
-            foreach($lines as $k => $v) {
+        if ($pos > 0) {
+            foreach ($lines as $k => $v) {
                 $lines[$k] = str_repeat($this->styler->getWhitespace(), $pos).$v;
             }
         }
+
         return $lines;
     }
 

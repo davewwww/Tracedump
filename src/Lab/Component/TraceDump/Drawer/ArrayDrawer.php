@@ -7,7 +7,7 @@ use Lab\Component\TraceDump\Styler\StylerInterface;
 /**
  * @author David Wolter <david@dampfer.net>
  */
-class ArrayDrawer
+class ArrayDrawer implements DrawerInterface
 {
     const IDENTS = 4;
 
@@ -19,12 +19,15 @@ class ArrayDrawer
     /**
      * @param StylerInterface $styler
      */
-    function __construct(StylerInterface $styler)
+    public function __construct(StylerInterface $styler)
     {
         $this->styler = $styler;
     }
 
-    function draw(array $data, $deep = 0, $pos = 0)
+    /**
+     * {@inheritdoc}
+     */
+    public function draw(array $data, $deep = 0, $pos = 0)
     {
         $styler = $this->styler;
 

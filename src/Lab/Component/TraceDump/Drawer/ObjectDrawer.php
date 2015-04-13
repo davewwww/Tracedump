@@ -7,7 +7,7 @@ use Lab\Component\TraceDump\Styler\StylerInterface;
 /**
  * @author David Wolter <david@dampfer.net>
  */
-class ObjectDrawer
+class ObjectDrawer implements DrawerInterface
 {
     const IDENTS = 4;
 
@@ -24,14 +24,17 @@ class ObjectDrawer
     /**
      * @param StylerInterface $styler
      */
-    function __construct(StylerInterface $styler)
+    public function __construct(StylerInterface $styler)
     {
         $this->styler = $styler;
         $this->methodDrawer = new MethodDrawer($styler);
         $this->propertyDrawer = new ObjectPropertiesDrawer($styler);
     }
 
-    function draw(array $data, $deep = 0, $pos = 0)
+    /**
+     * {@inheritdoc}
+     */
+    public function draw(array $data, $deep = 0, $pos = 0)
     {
         $object = $data["object"];
         $reflection = $data["reflection"];

@@ -2,19 +2,28 @@
 
 namespace Lab\Component\TraceDump\Styler\Coloring;
 
+use Lab\Component\TraceDump\Styler\Schema\SchemaInterface;
+
 /**
  * @author David Wolter <david@dampfer.net>
  */
 abstract class AbstractColoring implements ColoringInterface
 {
     /**
+     * @var SchemaInterface
+     */
+    protected $schema;
+
+    /**
      * @var string
      */
     protected $text;
+
     /**
      * @var string
      */
     protected $textColor;
+
     /**
      * @var string
      */
@@ -26,11 +35,23 @@ abstract class AbstractColoring implements ColoringInterface
     protected $style;
 
     /**
-     * @param $text
+     * @param string          $text
+     * @param SchemaInterface $schema
      */
-    public function __construct($text)
+    public function __construct($text, SchemaInterface $schema)
     {
         $this->text = $text;
+        $this->schema = $schema;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getColorFromSchema($schema)
+    {
+        $all = $this->schema->getAll();
+
+        return isset($all[$schema]) ? $all[$schema] : ColoringInterface::NO_COLOR;
     }
 
     /**
