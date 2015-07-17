@@ -1,26 +1,31 @@
 {
-    "name": "lab/tracedump",
-    "description": ":TODO:",
-    "keywords": ["dump", "trace"],
-    "homepage": "http://www.lovoo.com",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "David Wolter",
-            "email": "david@lovoo.com",
-            "homepage": "http://www.lovoo.com"
-        }
-    ],
-    "require": {
-        "php": ">=5.4.0"
-    },
-	"autoload": {
- 		"psr-0": { "Lab\\Component\\TraceDump": "src/" },
-        "files": [ "src/Lab/Component/TraceDump/Resources/functions/functions.php" ]
-	},
-    "require-dev": {
-        "phpunit/phpunit": "~4.0",
-        "symfony/var-dumper": "2.6.*@dev"
+  "name": "dwo/tracedump",
+  "description": ":TODO:",
+  "keywords": ["dump", "trace"],
+  "homepage": "https://github.com/davewwww",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dave Www",
+      "email": "davewwwo@gmail.com",
+      "homepage": "https://github.com/davewwww"
     }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "autoload": {
+    "psr-0": {"Dwo\\Tracedump": "src/"},
+    "files": ["src/Dwo/Tracedump/Resources/functions/functions.php"]
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0",
+    "symfony/var-dumper": "~2.6"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  }
 }
