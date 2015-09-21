@@ -2,7 +2,7 @@
 
 namespace Dwo\Tracedump\Styler;
 
-use Symfony\Component\VarDumper\VarDumper;
+use Dwo\Tracedump\Tracedump;
 
 /**
  * @author Dave Www <davewwwo@gmail.com>
@@ -48,6 +48,6 @@ class CliStyler extends DefaultStyler implements StylerInterface
         $newLine = $this->getNewLine();
         $dump = implode($this->getSeperator(), $dumps).$this->getNewLine();
 
-        return $dump.$newLine.$newLine;
+        return $dump.$newLine.Tracedump::calledIn().$newLine;
     }
 }

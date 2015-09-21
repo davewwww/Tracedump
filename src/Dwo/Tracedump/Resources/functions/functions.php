@@ -1,5 +1,7 @@
 <?php
 
+use Dwo\Tracedump\Tracedump;
+
 function td()
 {
     if(!headers_sent()) {

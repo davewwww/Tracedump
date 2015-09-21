@@ -31,4 +31,31 @@ class Tracedump
     {
         Styler::forceCli($force);
     }
+
+    /**
+     * @return array
+     */
+    public static function calledIn()
+    {
+        $debugs = (array) debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+
+        $key = null;
+        foreach ($debugs as $key => $debug) {
+            $str = isset($debug['file']) ? $debug['file'] : '';
+            $str.= isset($debug['class']) ? $debug['class'] : '';
+            if (!preg_match('/tracedump/i', $str)) {
+                break;
+            }
+        }
+
+        $file = $debugs[$key]['file'];
+        $line = $debugs[$key]['line'];
+        if (null !== $key) {
+            if (isset($debugs[$key + 1]['class'])) {
+                $file = $debugs[$key + 1]['class'];
+            }
+        }
+
+        return sprintf('called in "%s" at line %s', $file, $line);
+    }
 }
