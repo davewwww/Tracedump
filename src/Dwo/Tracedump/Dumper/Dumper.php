@@ -83,7 +83,7 @@ class Dumper
      */
     private static function dumpObject($object)
     {
-        $reflection = new \ReflectionClass($object);
+        $reflection = new \ReflectionObject($object);
 
         return array(
             "type"       => "object",

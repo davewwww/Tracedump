@@ -2,27 +2,38 @@
 
 namespace Dwo\Tracedump\Tests;
 
-use Dwo\Tracedump\TraceDump;
+use Dwo\Tracedump\Tracedump;
 
 class Test extends \PHPUnit_Framework_TestCase
 {
 
-    public function test()
+    public function testObject()
     {
-        #include __DIR__."/../Resources/functions/lib/die_console.php";
-
-        $a = 1;
-        #$a = array(1);
-        #$a = [1, 2];
-        #$a = ["foo" => 123, "lorem ipsum" => 44432, "dave" => 9999];
-        #$a = $this->getTEstArray();
-        #$a = ["foo" => ["sun", "set", [666]]];
-        #$a = ["mann" => new Mann()];
-        #$a = ["mann"];
         $a = new Mann();
 
-        #die(tde($a));
-        die(TraceDump::tracedump($a));
+        $output = Tracedump::tracedump($a);
+
+        self::assertContains('Dwo\Tracedump\Tests\Mann', $output);
+        self::assertContains('getBart()', $output);
+        self::assertContains('Dwo\Tracedump\Tests\Mensch', $output);
+        self::assertContains('__construct()', $output);
+        self::assertContains('$bart', $output);
+        self::assertContains('"drecking"', $output);
+
+        #die(Tracedump::tracedump($a));
+    }
+
+    public function testStdClass()
+    {
+
+        $a = new \stdClass();
+        $a->foo = 'bar';
+
+        $output = Tracedump::tracedump($a);
+
+        self::assertContains('$foo', $output);
+
+        #die(Tracedump::tracedump($a));
     }
 
     private function getTEstArray()
