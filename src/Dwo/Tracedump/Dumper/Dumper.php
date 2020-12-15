@@ -26,7 +26,7 @@ class Dumper
                 break;
 
             case "resource":
-                $value = "Ressource: ".get_resource_type($data);
+                $value = "Resource: ".get_resource_type($data);
                 break;
 
             case "string":
@@ -109,8 +109,14 @@ class Dumper
             foreach ($method->getParameters() as $reflectionParameter) {
 
                 $cast = $castType = null;
-                if (null !== $class = $reflectionParameter->getClass()) {
-                    $cast = $class->getShortName();
+                $cast = $castType = null;
+//                if (null !== $class = $reflectionParameter->getClass()) {
+//                    $cast = $class->getShortName();
+//                    $castType = "object";
+//                }
+                if (null !== $type = $reflectionParameter->getType()) {
+                    $fullClassname = $type->getName();
+                    $cast = substr(strrchr($fullClassname, "\\"), 1);
                     $castType = "object";
                 } elseif ($reflectionParameter->isArray()) {
                     $cast = $castType = "array";
