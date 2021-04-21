@@ -115,7 +115,21 @@ class Dumper
 //                    $castType = "object";
 //                }
                 if (null !== $type = $reflectionParameter->getType()) {
-                    $fullClassname = $type->getName();
+                    if(method_exists($type,'getName')) {
+                        $fullClassname = $type->getName();
+                    }
+                    else {
+                        if($type instanceof \ReflectionUnionType) {
+                            $fullClassnames = [];
+                            foreach($type->getTypes() as $type) {
+                                $fullClassnames[] = $type->getName();
+                            }
+                            $fullClassname = implode('|',$fullClassnames);
+                        }
+                        else {
+                            $fullClassname = ':TODO';
+                        }
+                    }
                     $cast = substr(strrchr($fullClassname, "\\"), 1);
                     $castType = "object";
                 } elseif ($reflectionParameter->isArray()) {
